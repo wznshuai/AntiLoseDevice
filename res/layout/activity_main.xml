@@ -1,109 +1,130 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SlidingPaneLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/container"
+    android:id="@+id/sliding_pane_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/black"
-    android:orientation="vertical" >
+    android:layout_height="match_parent" >
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/left_pane"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/ic_bg_blue_bitmap"
-        android:gravity="center_horizontal"
-        android:orientation="vertical" >
-
-        <ImageView
-            android:layout_width="80dp"
-            android:layout_height="30dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/ic_name" />
-
-        <com.antilosedevice.view.RoundedImageView
-            android:id="@+id/act_main_header"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/ic_unlink"
-            app:border_color="@android:color/white"
-            app:border_width="1px"
-            app:oval="true" />
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:scrollbars="none"
+        android:clipToPadding="false" >
 
         <TextView
-            android:id="@+id/act_main_status"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:shadowColor="@android:color/black"
-            android:shadowRadius="2.0"
-            android:text="@string/not_connect"
-            android:textColor="#82e6e8"
-            android:textSize="17sp" />
-    </LinearLayout>
+            android:autoLink="all"
+            android:gravity="left"
+            android:text="@string/about"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+    </ScrollView>
 
     <LinearLayout
+        android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@drawable/ic_bg_black_bitmap"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
         android:orientation="vertical" >
 
-        <ImageView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_blackbg_shadow" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" >
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/ic_bg_blue_bitmap"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
 
             <ImageView
-                android:id="@+id/tempId1"
-                android:layout_width="30dp"
+                android:layout_width="80dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_bluetoothmark" />
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_name" />
+
+            <com.antilosedevice.view.RoundedImageView
+                android:id="@+id/act_main_header"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_unlink"
+                app:border_color="@android:color/white"
+                app:border_width="1px"
+                app:oval="true" />
 
             <TextView
-                android:id="@+id/act_main_connect_detail"
-                android:layout_alignBottom="@+id/tempId1"
+                android:id="@+id/act_main_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:textColor="#8d8d8d"
-                android:textSize="17sp"/>
-        </RelativeLayout>
+                android:layout_marginTop="10dp"
+                android:shadowColor="@android:color/black"
+                android:shadowRadius="2.0"
+                android:text="@string/not_connect"
+                android:textColor="#82e6e8"
+                android:textSize="17sp" />
+        </LinearLayout>
 
-        <ImageView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="5dp"
-            android:background="#8d8d8d" />
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="@drawable/ic_bg_black_bitmap"
+            android:orientation="vertical" >
 
-        <ImageView
-            android:id="@+id/act_main_search"
-            android:layout_width="100dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/ic_search_selector" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_blackbg_shadow" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" >
 
-        <ListView
-            android:id="@+id/paired_devices"
-            android:paddingTop="10dp"
-            android:clipToPadding="false"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:cacheColorHint="@android:color/transparent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:listSelector="@drawable/list_item_selector" />
+                <ImageView
+                    android:id="@+id/tempId1"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_bluetoothmark" />
 
+                <TextView
+                    android:id="@+id/act_main_connect_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/tempId1"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="#8d8d8d"
+                    android:textSize="17sp" />
+            </RelativeLayout>
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="5dp"
+                android:background="#8d8d8d" />
+
+            <ImageView
+                android:id="@+id/act_main_search"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_search_selector" />
+
+            <ListView
+                android:id="@+id/paired_devices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:cacheColorHint="@android:color/transparent"
+                android:clipToPadding="false"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp"
+                android:listSelector="@drawable/list_item_selector"
+                android:paddingTop="10dp" />
+        </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
+</android.support.v4.widget.SlidingPaneLayout>

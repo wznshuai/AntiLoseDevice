@@ -28,6 +28,7 @@ import android.os.Message;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.os.Vibrator;
+import android.support.v4.widget.SlidingPaneLayout;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -42,8 +43,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.antilosedevice.service.ConnectService_bluetooth_Under4;
+import com.antilosedevice.util.SharedPreferencesUtil;
 
 public class MainActivity_Bluetooth_Under4 extends Activity {
+	
+	private SlidingPaneLayout mSlidingLayout;
 
 	public static final String TAG = "ConnectService";
 
@@ -114,6 +118,17 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		// if (null != action && action.equals(ACTION_CONNECT_LOSE)) {
 		// setBuyStatus(ConnectService.STATE_LOSE_CONNECT);
 		// }
+	}
+	
+	private boolean isFirstSetup(){
+		boolean temp = true;
+		SharedPreferencesUtil spu = SharedPreferencesUtil
+				.getInstance(getApplicationContext());
+		temp = spu.getBoolean(TAG, true);
+		if(temp){
+			spu.saveBoolean(TAG, false);
+		}
+		return temp;
 	}
 
 	private void setBuyStatus(int status) {
@@ -213,6 +228,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	}
 
 	private void findViews() {
+		mSlidingLayout = (SlidingPaneLayout) findViewById(R.id.sliding_pane_layout);
 		mStatusTxt = (TextView) findViewById(R.id.act_main_status);
 		mConnectDetail = (TextView) findViewById(R.id.act_main_connect_detail);
 		mSearch = findViewById(R.id.act_main_search);
@@ -220,6 +236,9 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	}
 
 	private void initViews() {
+		if(isFirstSetup()){
+			mSlidingLayout.openPane();
+		}
 		mSearch.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -415,7 +434,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	
 	
 	public void onCreateContextMenu(android.view.ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-		
+		menu.add("帮助");
 	};
 
 	private final BroadcastReceiver getUUIDs = new BroadcastReceiver() {
