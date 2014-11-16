@@ -431,12 +431,6 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		}
 	};
 	
-	
-	
-	public void onCreateContextMenu(android.view.ContextMenu menu, View v, android.view.ContextMenu.ContextMenuInfo menuInfo) {
-		menu.add("帮助");
-	};
-
 	private final BroadcastReceiver getUUIDs = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
