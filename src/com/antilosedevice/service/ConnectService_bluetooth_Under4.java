@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -268,10 +269,10 @@ public class ConnectService_bluetooth_Under4 extends Service {
 					}
 
 					if (startState == STATE_CONNECTED) {
-						if (null != mHandler)
+//						if (null != mHandler)
 							connectionLost();
-						else
-							resetState();
+//						else
+//							resetState();
 					} else if (startState == STATE_CONNECTING) {
 						Log.d(TAG, "重连失败");
 						System.out.println("重试时间到");
@@ -392,11 +393,10 @@ public class ConnectService_bluetooth_Under4 extends Service {
 		mState = STATE_LOSE_CONNECT;
 		Intent intent = new Intent(
 				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent.setClass(getApplicationContext(),
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setClass(getBaseContext(),
 				MainActivity_Bluetooth_Under4.class);
-		startActivity(intent);
+		getApplicationContext().startActivity(intent);
 	}
 
 	/**

@@ -32,11 +32,11 @@
         </activity>
         <service android:name="com.antilosedevice.service.ConnectService"/>
          <service android:name="com.antilosedevice.service.ConnectService_bluetooth_Under4"/>
-        <receiver android:name="com.antilosedevice.receiver.MyReceiver">
+       <!--  <receiver android:name="com.antilosedevice.receiver.MyReceiver">
             <intent-filter >
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
-        </receiver>
+        </receiver> -->
     </application>
 
 </manifest>

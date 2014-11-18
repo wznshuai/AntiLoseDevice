@@ -90,11 +90,13 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	private Animation mRotateAnim;
 	private MediaPlayer player;
 	private List<String> mScanedDevice;
+	private TextView hashcode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		System.out.println("onCreateonCreateonCreateonCreate");
 		if (!enableBluetooth()) {
 			new AlertDialog.Builder(MainActivity_Bluetooth_Under4.this)
 					.setMessage("蓝牙设备不可用")
@@ -221,6 +223,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
+		System.out.println("onNewIntentonNewIntentonNewIntent");
 		String action = intent.getAction();
 		if (null != action && action.equals(ACTION_CONNECT_LOSE)) {
 			setBuyStatus(ConnectService_bluetooth_Under4.STATE_LOSE_CONNECT);
@@ -233,6 +236,13 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		mConnectDetail = (TextView) findViewById(R.id.act_main_connect_detail);
 		mSearch = findViewById(R.id.act_main_search);
 		mHeader = (ImageView) findViewById(R.id.act_main_header);
+		hashcode = (TextView)findViewById(R.id.hashcode);
+	}
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		hashcode.setText(getClass().getSimpleName() + "--" + hashCode());
 	}
 
 	private void initViews() {
@@ -515,7 +525,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 			break;
 		}
 
-		new AlertDialog.Builder(MainActivity_Bluetooth_Under4.this)
+		AlertDialog ad = new AlertDialog.Builder(MainActivity_Bluetooth_Under4.this)
 				.setMessage("蓝牙连接已断开!").setCancelable(false)
 				.setNeutralButton("确定", new OnClickListener() {
 
@@ -533,7 +543,9 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 						mConnectService.resetState();
 						dialog.cancel();
 					}
-				}).show();
+				}).create();
+		ad.setCanceledOnTouchOutside(false);	
+		ad.show();
 	}
 
 	// The Handler that gets information back from the BluetoothChatService
@@ -707,22 +719,27 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 
 	@Override
 	protected void onDestroy() {
+		System.out.println("onDestroyonDestroy");
 		// Make sure we're not doing discovery anymore
 		if (mBluetoothAdapter != null && mBluetoothAdapter.isDiscovering()) {
 			mBluetoothAdapter.cancelDiscovery();
+		}
+		
+		if(null != mConnectService){
+			int state = mConnectService.getState();
+			if(state != ConnectService_bluetooth_Under4.STATE_CONNECTED && state != ConnectService_bluetooth_Under4.STATE_CONNECTING){
+				mConnectService.resetState();
+			}
 		}
 
 		// Unregister broadcast listeners
 		try {
 			unregisterReceiver(getUUIDs);
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		try {
 			unregisterReceiver(mReceiver);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		super.onDestroy();
 	};
@@ -744,6 +761,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 			} else {
 				Toast.makeText(this, R.string.bluetooth_disable,
 						Toast.LENGTH_SHORT).show();
+				System.out.println("aaaaaaaaaaaa");
 				finish();
 			}
 			break;
@@ -753,6 +771,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 			} else {
 				Toast.makeText(this, R.string.bluetooth_disable,
 						Toast.LENGTH_SHORT).show();
+				System.out.println("bbbbbbbbbbbbbb");
 				finish();
 			}
 			break;

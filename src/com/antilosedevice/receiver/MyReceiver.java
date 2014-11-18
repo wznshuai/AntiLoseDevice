@@ -9,7 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
-import com.antilosedevice.service.ConnectService;
+import com.antilosedevice.service.ConnectService_bluetooth_Under4;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
 public class MyReceiver extends BroadcastReceiver{
@@ -26,14 +26,14 @@ public class MyReceiver extends BroadcastReceiver{
 		new Thread() {
 			public void run() {
 				SharedPreferencesUtil spu = SharedPreferencesUtil.getInstance(context);
-				String address = spu.getString(ConnectService.DEVICE_ADDRESS_KEY);
+				String address = spu.getString(ConnectService_bluetooth_Under4.DEVICE_ADDRESS_KEY);
 				System.out.println("address : " + address);
-				List<UUID> uuidList = spu.getList(ConnectService.UUIDS_KEY, UUID.class);
+				List<UUID> uuidList = spu.getList(ConnectService_bluetooth_Under4.UUIDS_KEY, UUID.class);
 				System.out.println("uuidList : " + uuidList);
 				if(!TextUtils.isEmpty(address) && null != uuidList && uuidList.size() > 0){
-					ConnectService mConnectService = null;
+					ConnectService_bluetooth_Under4 mConnectService = null;
 					if (null == mConnectService) {
-						mConnectService = ConnectService.get(context, null);
+						mConnectService = ConnectService_bluetooth_Under4.get(context, null);
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e) {
@@ -42,7 +42,7 @@ public class MyReceiver extends BroadcastReceiver{
 					}
 
 					if (null != mConnectService) {
-						mConnectService.connect(BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address));
+						mConnectService.connect(BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address), uuidList);
 					}
 				}
 			};
