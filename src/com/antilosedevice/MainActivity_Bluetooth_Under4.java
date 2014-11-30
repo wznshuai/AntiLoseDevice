@@ -42,6 +42,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.antilosedevice.service.BaseService;
+import com.antilosedevice.service.ConnectService_bluetooth_4;
 import com.antilosedevice.service.ConnectService_bluetooth_Under4;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
@@ -76,7 +78,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 
 	private BluetoothAdapter mBluetoothAdapter = null;
 
-	private ConnectService_bluetooth_Under4 mConnectService;
+	private BaseService mConnectService;
 	private ArrayAdapter<String> mPairedDevicesArrayAdapter;
 	private TextView mStatusTxt, mConnectDetail;
 	private List<UUID> mUUIDList;
@@ -625,6 +627,16 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		}
 		return true;
 	}
+	
+	public void initConnectService(boolean isBLE){
+		if(isBLE){
+			mConnectService = ConnectService_bluetooth_4.get(
+								getApplicationContext(), mHandler);
+		}else{
+			mConnectService = ConnectService_bluetooth_Under4.get(
+					getApplicationContext(), mHandler);
+		}
+	}
 
 	private OnItemClickListener mDeviceClickListener = new OnItemClickListener() {
 		public void onItemClick(AdapterView<?> av, final View v, int arg2,
@@ -647,10 +659,30 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 				public void run() {
 					String info = ((TextView) v).getText().toString();
 					String address = info.substring(info.length() - 17);
+					mClickDevice = mBluetoothAdapter
+							.getRemoteDevice(address);
+					boolean isBLE = false;
+					if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2){//具有低功耗API
+						if(mClickDevice.getType() == BluetoothDevice.DEVICE_TYPE_LE){//启用低功耗service
+							isBLE = true;
+						}
+					}
+					
+					if(null == mConnectService){
+						initConnectService(isBLE);
+					}else{
+						if(isBLE && mConnectService instanceof ConnectService_bluetooth_Under4){
+							mConnectService.stopSelf();
+							mConnectService = null;
+							initConnectService(isBLE);
+						}else if(!isBLE && mConnectService instanceof ConnectService_bluetooth_4){
+							mConnectService.stopSelf();
+							mConnectService = null;
+							initConnectService(isBLE);
+						}
+					}
 
 					if (null == mConnectService) {
-						mConnectService = ConnectService_bluetooth_Under4.get(
-								getApplicationContext(), mHandler);
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e) {
@@ -662,8 +694,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 						mHandler.obtainMessage(MESSAGE_STATE_CHANGE,
 								STATE_INIT, 0).sendToTarget();
 						mConnectService.resetState();
-						mClickDevice = mBluetoothAdapter
-								.getRemoteDevice(address);
+						
 						if (!isRegistered) {
 							isRegistered = true;
 							registerReceiver(getUUIDs, new IntentFilter(
@@ -679,34 +710,48 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 								}
 							}
 						}
-						mClickDevice.fetchUuidsWithSdp();
-						ParcelUuid[] p = mClickDevice.getUuids();
-						if (null != p && p.length > 0) {
-							try {
-								unregisterReceiver(getUUIDs);
-								isRegistered = false;
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							mUUIDList = new ArrayList<UUID>();
-							for (ParcelUuid pu : p) {
-								mUUIDList.add(pu.getUuid());
-							}
-							synchronized (lock) {
-								isUUIDListREADY = true;
-								lock.notifyAll();
-							}
-						}
-						synchronized (lock) {
-							while (!isPairSuccess || !isUUIDListREADY) {
+						if(!isBLE){
+							mClickDevice.fetchUuidsWithSdp();
+							ParcelUuid[] p = mClickDevice.getUuids();
+							if (null != p && p.length > 0) {
 								try {
-									lock.wait();
-								} catch (InterruptedException e) {
+									unregisterReceiver(getUUIDs);
+									isRegistered = false;
+								} catch (Exception e) {
 									e.printStackTrace();
 								}
+								mUUIDList = new ArrayList<UUID>();
+								for (ParcelUuid pu : p) {
+									mUUIDList.add(pu.getUuid());
+								}
+								synchronized (lock) {
+									isUUIDListREADY = true;
+									lock.notifyAll();
+								}
 							}
-							connect(mClickDevice);
+							synchronized (lock) {
+								while (!isPairSuccess || !isUUIDListREADY) {
+									try {
+										lock.wait();
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+								connect(mClickDevice);
+							}
+						}else{
+							synchronized (lock) {
+								while (!isPairSuccess) {
+									try {
+										lock.wait();
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+								}
+								connect(mClickDevice);
+							}
 						}
+						
 					}else{
 						mHandler.obtainMessage(MESSAGE_STATE_CHANGE,
 								ConnectService_bluetooth_Under4.STATE_CONNECT_FAIL, 0).sendToTarget();

@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.antilosedevice.service.ConnectService"/>
+        <service android:name="com.antilosedevice.service.ConnectService_bluetooth_4"/>
          <service android:name="com.antilosedevice.service.ConnectService_bluetooth_Under4"/>
        <!--  <receiver android:name="com.antilosedevice.receiver.MyReceiver">
             <intent-filter >

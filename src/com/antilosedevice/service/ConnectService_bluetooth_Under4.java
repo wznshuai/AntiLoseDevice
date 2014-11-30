@@ -7,22 +7,17 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.antilosedevice.MainActivity_Bluetooth_Under4;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
-public class ConnectService_bluetooth_Under4 extends Service {
+public class ConnectService_bluetooth_Under4 extends BaseService {
 	// Debugging
 	private static final String TAG = "ConnectService";
 	private static final boolean D = true;
@@ -34,61 +29,14 @@ public class ConnectService_bluetooth_Under4 extends Service {
 
 	public static final String UUIDS_KEY = "UUIDS_KEY";
 	public static final String DEVICE_ADDRESS_KEY = "DEVICE_ADDRESS_KEY";
-	// Member fields
-	private BluetoothAdapter mAdapter;
-	private Handler mHandler;
 	private ConnectThread mConnectThread;
 	private ConnectedThread mConnectedThread;
-	private int mState;
-	private BluetoothDevice mDevice;
 	private TimerThread mTimerThread;
 	private boolean isStopRertyNow = false;
+	
+	protected List<UUID> mUUIDList;
 
-	public BluetoothDevice getCurDevice() {
-		return mDevice;
-	}
-
-	// Constants that indicate the current connection state
-	public static final int STATE_NONE = 0; // we're doing nothing
-	public static final int STATE_LISTEN = 1; // now listening for incoming
-												// connections
-	public static final int STATE_CONNECTING = 2; // now initiating an outgoing
-													// connection
-	public static final int STATE_CONNECTED = 3; // now connected to a remote
-													// device
-	public static final int STATE_LOSE_CONNECT = 4;
-
-	public static final int STATE_CONNECT_FAIL = 5; // now connected to a remote
-
-	public static final int STATE_PAIR_FAIL = 6;// 匹配失败
-	// device
-	private static ConnectService_bluetooth_Under4 mInstance;
-	private static Object mWait = new Object();
-	private List<UUID> mUUIDList;
-
-	public static synchronized ConnectService_bluetooth_Under4 get(
-			Context context, Handler handler) {
-		if (mInstance == null) {
-			context.startService(new Intent(context,
-					ConnectService_bluetooth_Under4.class));
-			while (mInstance == null) {
-				try {
-					synchronized (mWait) {
-						mWait.wait();
-					}
-					mInstance.mAdapter = BluetoothAdapter.getDefaultAdapter();
-					mInstance.mHandler = handler;
-					mInstance.mState = STATE_NONE;
-				} catch (InterruptedException ignored) {
-				}
-			}
-		} else {
-			mInstance.mHandler = handler;
-		}
-
-		return mInstance;
-	}
-
+	@Override
 	public void resetState() {
 		isStopRertyNow = false;
 
@@ -107,59 +55,7 @@ public class ConnectService_bluetooth_Under4 extends Service {
 		mState = STATE_NONE;
 	}
 
-	@Override
-	public void onCreate() {
-		super.onCreate();
-		mInstance = this;
-		synchronized (mWait) {
-			mWait.notifyAll();
-		}
-	}
-
-	public boolean isConnected() {
-		setState(mState);
-		if (mState == STATE_CONNECTED) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-		mAdapter = BluetoothAdapter.getDefaultAdapter();
-		return Service.START_STICKY;
-	}
-
-	/**
-	 * Set the current state of the chat connection
-	 * 
-	 * @param state
-	 *            An integer defining the current connection state
-	 */
-	private synchronized void setState(int state) {
-		if (D)
-			Log.d(TAG, "setState() " + mState + " -> " + state);
-		mState = state;
-
-		// Give the new state to the Handler so the UI Activity can update
-		if (null == mHandler)
-			return;
-		if (state != STATE_CONNECTED)
-			mHandler.obtainMessage(
-					MainActivity_Bluetooth_Under4.MESSAGE_STATE_CHANGE, state,
-					-1).sendToTarget();
-		else
-			mHandler.obtainMessage(
-					MainActivity_Bluetooth_Under4.MESSAGE_STATE_CHANGE, state,
-					-1, "已连接至" + mDevice.getName()).sendToTarget();
-	}
-
-	/**
-	 * Return the current connection state.
-	 */
-	public synchronized int getState() {
-		return mState;
-	}
+	
 
 	/**
 	 * Start the chat service. Specifically start AcceptThread to begin a
@@ -193,6 +89,7 @@ public class ConnectService_bluetooth_Under4 extends Service {
 	 * @param secure
 	 *            Socket Security type - Secure (true) , Insecure (false)
 	 */
+	@Override
 	public synchronized boolean connect(BluetoothDevice device,
 			List<UUID> uuidList) {
 		if (null == mAdapter)
@@ -389,7 +286,8 @@ public class ConnectService_bluetooth_Under4 extends Service {
 	/**
 	 * Indicate that the connection was lost and notify the UI Activity.
 	 */
-	private void connectionLost() {
+	@Override
+	public void connectionLost() {
 		mState = STATE_LOSE_CONNECT;
 		Intent intent = new Intent(
 				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
@@ -599,5 +497,14 @@ public class ConnectService_bluetooth_Under4 extends Service {
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
+	}
+	
+	@Override
+	public void onDestroy() {
+		if(null != mDevice){
+			resetState();
+			mDevice = null;
+		}
+		super.onDestroy();
 	}
 }
