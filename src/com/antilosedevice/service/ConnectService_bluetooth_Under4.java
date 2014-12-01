@@ -7,10 +7,13 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -21,20 +24,20 @@ public class ConnectService_bluetooth_Under4 extends BaseService {
 	// Debugging
 	private static final String TAG = "ConnectService";
 	private static final boolean D = true;
-	private static final int RERTY_TIME = 1 * 60 * 1000;// 5分钟（单位毫秒）
+	private static final int RERTY_TIME = 10 * 1000;// 5分钟（单位毫秒）
 
 	// Unique UUID for this application
 	private static final UUID MY_UUID_SECURE = UUID
 			.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-	public static final String UUIDS_KEY = "UUIDS_KEY";
-	public static final String DEVICE_ADDRESS_KEY = "DEVICE_ADDRESS_KEY";
 	private ConnectThread mConnectThread;
 	private ConnectedThread mConnectedThread;
 	private TimerThread mTimerThread;
 	private boolean isStopRertyNow = false;
 	
 	protected List<UUID> mUUIDList;
+	
+	
 
 	@Override
 	public void resetState() {
@@ -286,16 +289,16 @@ public class ConnectService_bluetooth_Under4 extends BaseService {
 	/**
 	 * Indicate that the connection was lost and notify the UI Activity.
 	 */
-	@Override
-	public void connectionLost() {
-		mState = STATE_LOSE_CONNECT;
-		Intent intent = new Intent(
-				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		intent.setClass(getBaseContext(),
-				MainActivity_Bluetooth_Under4.class);
-		getApplicationContext().startActivity(intent);
-	}
+//	@Override
+//	public void connectionLost() {
+//		mState = STATE_LOSE_CONNECT;
+//		Intent intent = new Intent(
+//				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
+//		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//		intent.setClass(getBaseContext(),
+//				MainActivity_Bluetooth_Under4.class);
+//		getApplicationContext().startActivity(intent);
+//	}
 
 	/**
 	 * This thread runs while attempting to make an outgoing connection with a

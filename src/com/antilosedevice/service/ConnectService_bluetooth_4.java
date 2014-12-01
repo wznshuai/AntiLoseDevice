@@ -3,7 +3,6 @@ package com.antilosedevice.service;
 import java.util.List;
 import java.util.UUID;
 
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
@@ -13,11 +12,11 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.antilosedevice.MainActivity_Bluetooth_4;
+import com.antilosedevice.MainActivity_Bluetooth_Under4;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
 public class ConnectService_bluetooth_4 extends BaseService {
@@ -25,16 +24,11 @@ public class ConnectService_bluetooth_4 extends BaseService {
 	private static final String TAG = "ConnectService";
 	private static final boolean D = true;
 
-	public static final String UUIDS_KEY = "UUIDS_KEY";
-	public static final String DEVICE_ADDRESS_KEY = "DEVICE_ADDRESS_KEY";
 	// Member fields
-	private BluetoothAdapter mAdapter;
-	private Handler mHandler;
 	private ConnectThread mConnectThread;
-	private int mState;
-	private BluetoothDevice mDevice;
 	private MyBluetoothGattCallback mGattCallback;
 	private BluetoothManager mBluetoothManager;
+	
 
 	public BluetoothDevice getCurDevice() {
 		return mDevice;
@@ -89,7 +83,6 @@ public class ConnectService_bluetooth_4 extends BaseService {
 		}
 		if (D)
 			Log.d(TAG, "connect to: " + device);
-		// Cancel any thread attempting to make a connection
 		if (mState == STATE_CONNECTING) {
 			if (mConnectThread != null) {
 				mConnectThread = null;
@@ -130,16 +123,16 @@ public class ConnectService_bluetooth_4 extends BaseService {
 	/**
 	 * Indicate that the connection was lost and notify the UI Activity.
 	 */
-	@Override
-	public void connectionLost() {
-		mState = STATE_LOSE_CONNECT;
-		Intent intent = new Intent(MainActivity_Bluetooth_4.ACTION_CONNECT_LOSE);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-		intent.setClass(getApplicationContext(), MainActivity_Bluetooth_4.class);
-		startActivity(intent);
-	}
-	
+//	@Override
+//	public void connectionLost() {
+//		mState = STATE_LOSE_CONNECT;
+//		Intent intent = new Intent(MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
+//		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//		intent.addFlags(Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//		intent.setClass(getApplicationContext(), MainActivity_Bluetooth_Under4.class);
+//		startActivity(intent);
+//	}
+//	
 	class MyBluetoothGattCallback extends BluetoothGattCallback{
 
 		@Override

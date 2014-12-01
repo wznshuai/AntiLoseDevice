@@ -34,7 +34,7 @@ public class MyReceiver extends BroadcastReceiver{
 				if(!TextUtils.isEmpty(address) && null != uuidList && uuidList.size() > 0){
 					BaseService mConnectService = null;
 					if (null == mConnectService) {
-						mConnectService = ConnectService_bluetooth_Under4.get(context, null);
+						mConnectService = ConnectService_bluetooth_Under4.get(context, null, null);
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e) {

@@ -92,7 +92,6 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	private Animation mRotateAnim;
 	private MediaPlayer player;
 	private List<String> mScanedDevice;
-	private TextView hashcode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +121,13 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		// if (null != action && action.equals(ACTION_CONNECT_LOSE)) {
 		// setBuyStatus(ConnectService.STATE_LOSE_CONNECT);
 		// }
+	}
+	
+	@Override
+	public void onBackPressed() {
+		Intent home = new Intent(Intent.ACTION_MAIN);
+		home.addCategory(Intent.CATEGORY_HOME);
+		startActivity(home);
 	}
 	
 	private boolean isFirstSetup(){
@@ -165,7 +171,7 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 			mStatusTxt.setText(R.string.scaning);
 			break;
 		case STATE_SEARCH_COMPLETED:
-			if (mConnectService.isConnected()) {
+			if (null != mConnectService && mConnectService.isConnected()) {
 				setBuyStatus(ConnectService_bluetooth_Under4.STATE_CONNECTED);
 			} else {
 				mHeader.clearAnimation();
@@ -238,13 +244,11 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 		mConnectDetail = (TextView) findViewById(R.id.act_main_connect_detail);
 		mSearch = findViewById(R.id.act_main_search);
 		mHeader = (ImageView) findViewById(R.id.act_main_header);
-		hashcode = (TextView)findViewById(R.id.hashcode);
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-		hashcode.setText(getClass().getSimpleName() + "--" + hashCode());
 	}
 
 	private void initViews() {
@@ -270,15 +274,15 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	private void initService() {
 		new Thread() {
 			public void run() {
-				if (null == mConnectService) {
-					mConnectService = ConnectService_bluetooth_Under4.get(
-							getApplicationContext(), mHandler);
-					try {
-						Thread.sleep(200);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+//				if (null == mConnectService) {
+//					mConnectService = ConnectService_bluetooth_Under4.get(
+//							getApplicationContext(), mHandler);
+//					try {
+//						Thread.sleep(200);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
 
 				if (null != mConnectService) {
 					mConnectService.isConnected();
@@ -631,10 +635,10 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 	public void initConnectService(boolean isBLE){
 		if(isBLE){
 			mConnectService = ConnectService_bluetooth_4.get(
-								getApplicationContext(), mHandler);
+								getApplicationContext(), mHandler, ConnectService_bluetooth_4.class);
 		}else{
 			mConnectService = ConnectService_bluetooth_Under4.get(
-					getApplicationContext(), mHandler);
+					getApplicationContext(), mHandler, ConnectService_bluetooth_Under4.class);
 		}
 	}
 
@@ -695,22 +699,26 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 								STATE_INIT, 0).sendToTarget();
 						mConnectService.resetState();
 						
-						if (!isRegistered) {
-							isRegistered = true;
-							registerReceiver(getUUIDs, new IntentFilter(
-									"android.bluetooth.device.action.UUID"));
-						}
-						pairMethod();
-						synchronized (pairLock) {
-							if (mClickDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
-								try {
-									pairLock.wait();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
+						
+						if(!isBLE){
+							
+							if (!isRegistered) {
+								isRegistered = true;
+								registerReceiver(getUUIDs, new IntentFilter(
+										"android.bluetooth.device.action.UUID"));
+							}
+							
+							pairMethod();
+							synchronized (pairLock) {
+								if (mClickDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
+									try {
+										pairLock.wait();
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
 								}
 							}
-						}
-						if(!isBLE){
+							
 							mClickDevice.fetchUuidsWithSdp();
 							ParcelUuid[] p = mClickDevice.getUuids();
 							if (null != p && p.length > 0) {
@@ -740,16 +748,8 @@ public class MainActivity_Bluetooth_Under4 extends Activity {
 								connect(mClickDevice);
 							}
 						}else{
-							synchronized (lock) {
-								while (!isPairSuccess) {
-									try {
-										lock.wait();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								}
-								connect(mClickDevice);
-							}
+							System.out.println("is BLE");
+							connect(mClickDevice);
 						}
 						
 					}else{

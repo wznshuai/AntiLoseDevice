@@ -206,7 +206,7 @@ public class MainActivity_Bluetooth_4 extends Activity {
 			public void run() {
 				if (null == mConnectService) {
 					mConnectService = ConnectService_bluetooth_4.get(
-							getApplicationContext(), mHandler);
+							getApplicationContext(), mHandler, ConnectService_bluetooth_4.class);
 					try {
 						Thread.sleep(200);
 					} catch (InterruptedException e) {
@@ -543,7 +543,7 @@ public class MainActivity_Bluetooth_4 extends Activity {
 
 					if (null == mConnectService) {
 						mConnectService = ConnectService_bluetooth_4.get(
-								getApplicationContext(), mHandler);
+								getApplicationContext(), mHandler, ConnectService_bluetooth_4.class);
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e) {

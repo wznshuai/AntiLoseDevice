@@ -53,10 +53,9 @@ public abstract class BaseService extends Service{
 	private static Object mWait = new Object();
 
 	public static synchronized BaseService get(
-			Context context, Handler handler) {
+			Context context, Handler handler, Class<? extends BaseService> c) {
 		if (mInstance == null) {
-			context.startService(new Intent(context,
-					ConnectService_bluetooth_Under4.class));
+			context.startService(new Intent(context, c));
 			while (mInstance == null) {
 				try {
 					synchronized (mWait) {
@@ -152,5 +151,13 @@ public abstract class BaseService extends Service{
 	/**
 	 * Indicate that the connection was lost and notify the UI Activity.
 	 */
-	abstract void connectionLost();
+	public void connectionLost(){
+		mState = STATE_LOSE_CONNECT;
+		Intent intent = new Intent(
+				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setClass(getBaseContext(),
+				MainActivity_Bluetooth_Under4.class);
+		getApplicationContext().startActivity(intent);
+	}
 }
