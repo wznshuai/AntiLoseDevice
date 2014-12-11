@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
-import com.antilosedevice.MainActivity_Bluetooth_Under4;
+import com.antilosedevice.MainActivity;
 
 public abstract class BaseService extends Service{
 	// Debugging
@@ -115,11 +115,11 @@ public abstract class BaseService extends Service{
 			return;
 		if (state != STATE_CONNECTED)
 			mHandler.obtainMessage(
-					MainActivity_Bluetooth_Under4.MESSAGE_STATE_CHANGE, state,
+					MainActivity.MESSAGE_STATE_CHANGE, state,
 					-1).sendToTarget();
 		else
 			mHandler.obtainMessage(
-					MainActivity_Bluetooth_Under4.MESSAGE_STATE_CHANGE, state,
+					MainActivity.MESSAGE_STATE_CHANGE, state,
 					-1, "已连接至" + mDevice.getName()).sendToTarget();
 	}
 
@@ -154,10 +154,10 @@ public abstract class BaseService extends Service{
 	public void connectionLost(){
 		mState = STATE_LOSE_CONNECT;
 		Intent intent = new Intent(
-				MainActivity_Bluetooth_Under4.ACTION_CONNECT_LOSE);
+				MainActivity.ACTION_CONNECT_LOSE);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.setClass(getBaseContext(),
-				MainActivity_Bluetooth_Under4.class);
+				MainActivity.class);
 		getApplicationContext().startActivity(intent);
 	}
 }

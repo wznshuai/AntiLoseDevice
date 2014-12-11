@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     
    <!--  <uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/> -->
 
@@ -17,11 +18,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_linked"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="com.antilosedevice.MyApplication" >
         <activity
-            android:name="com.antilosedevice.MainActivity_Bluetooth_Under4"
+            android:name="com.antilosedevice.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask" >
             <intent-filter>
@@ -32,11 +34,8 @@
         </activity>
         <service android:name="com.antilosedevice.service.ConnectService_bluetooth_4"/>
          <service android:name="com.antilosedevice.service.ConnectService_bluetooth_Under4"/>
-       <!--  <receiver android:name="com.antilosedevice.receiver.MyReceiver">
-            <intent-filter >
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver> -->
+        <meta-data android:value="54851b5ffd98c503fe00128d" android:name="UMENG_APPKEY"></meta-data>
+			<meta-data android:value="test" android:name="UMENG_CHANNEL"/>
     </application>
 
 </manifest>

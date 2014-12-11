@@ -17,7 +17,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.antilosedevice.MainActivity_Bluetooth_Under4;
+import com.antilosedevice.MainActivity;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
 public class ConnectService_bluetooth_Under4 extends BaseService {
