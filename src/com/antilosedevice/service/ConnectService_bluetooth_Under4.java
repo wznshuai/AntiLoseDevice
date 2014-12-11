@@ -7,24 +7,19 @@ import java.util.List;
 import java.util.UUID;
 
 import android.annotation.TargetApi;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.antilosedevice.MainActivity;
 import com.antilosedevice.util.SharedPreferencesUtil;
 
 public class ConnectService_bluetooth_Under4 extends BaseService {
 	// Debugging
 	private static final String TAG = "ConnectService";
 	private static final boolean D = true;
-	private static final int RERTY_TIME = 10 * 1000;// 5分钟（单位毫秒）
 
 	// Unique UUID for this application
 	private static final UUID MY_UUID_SECURE = UUID

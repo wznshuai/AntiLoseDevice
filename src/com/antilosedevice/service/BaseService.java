@@ -17,7 +17,7 @@ public abstract class BaseService extends Service{
 	// Debugging
 	protected static final String TAG = "ConnectService";
 	private static final boolean D = true;
-	protected static final int RERTY_TIME = 1 * 60 * 1000;// 5分钟（单位毫秒）
+	protected static final int RERTY_TIME = 10 * 1000;// 5分钟（单位毫秒）
 
 	// Unique UUID for this application
 	protected static final UUID MY_UUID_SECURE = UUID
