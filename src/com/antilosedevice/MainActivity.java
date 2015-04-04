@@ -1,11 +1,5 @@
 package com.antilosedevice;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +31,7 @@ import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -46,6 +41,12 @@ import com.antilosedevice.service.BaseService;
 import com.antilosedevice.service.ConnectService_bluetooth_4;
 import com.antilosedevice.service.ConnectService_bluetooth_Under4;
 import com.antilosedevice.util.SharedPreferencesUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends Activity {
 	
@@ -92,6 +93,8 @@ public class MainActivity extends Activity {
 	private Animation mRotateAnim;
 	private MediaPlayer player;
 	private List<String> mScanedDevice;
+    private Button mStopBtn;
+    private Button mStart;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -243,6 +246,8 @@ public class MainActivity extends Activity {
 		mConnectDetail = (TextView) findViewById(R.id.act_main_connect_detail);
 		mSearch = findViewById(R.id.act_main_search);
 		mHeader = (ImageView) findViewById(R.id.act_main_header);
+        mStopBtn = (Button)findViewById(R.id.btn_stop);
+        mStart = (Button)findViewById(R.id.btn_start_sound);
 	}
 	
 	@Override
@@ -262,6 +267,20 @@ public class MainActivity extends Activity {
 					scanNearBluetooths();
 			}
 		});
+        mStopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byte b[] = {new Integer(0xdd).byteValue(), new Integer(0x03).byteValue()};
+                mConnectService.sendMsg(b);
+            }
+        });
+        mStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                byte b[] = {new Integer(0xdd).byteValue(), new Integer(0x02).byteValue()};
+                mConnectService.sendMsg(b);
+            }
+        });
 	}
 
 	private void initData() {

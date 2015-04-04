@@ -97,6 +97,21 @@
                     android:layout_centerHorizontal="true"
                     android:textColor="#8d8d8d"
                     android:textSize="17sp" />
+
+                <Button
+                    android:id="@+id/btn_stop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="禁止报警"/>
+
+                <Button
+                    android:id="@+id/btn_start_sound"
+                    android:layout_toRightOf="@+id/btn_stop"
+                    android:layout_marginLeft="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开始报警"/>
+
             </RelativeLayout>
 
             <ImageView

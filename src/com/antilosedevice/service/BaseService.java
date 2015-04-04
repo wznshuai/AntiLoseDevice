@@ -160,4 +160,6 @@ public abstract class BaseService extends Service{
 				MainActivity.class);
 		getApplicationContext().startActivity(intent);
 	}
+
+    public void sendMsg(byte[] b){}
 }

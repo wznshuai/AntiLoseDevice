@@ -1,32 +1,38 @@
 package com.antilosedevice.service;
 
-import java.util.List;
-import java.util.UUID;
-
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.antilosedevice.util.SharedPreferencesUtil;
 
+import java.util.List;
+import java.util.UUID;
+
 public class ConnectService_bluetooth_4 extends BaseService {
 	// Debugging
 	private static final String TAG = "ConnectService";
 	private static final boolean D = true;
+    private static final String PARENT_UUID = "0000fff0-0000-1000-8000-00805f9b34fb";
+    private static final String CHILD_UUID = "0000fff4-0000-1000-8000-00805f9b34fb";
+    private static final String WRITE_UUID = "0000fff1-0000-1000-8000-00805f9b34fb";
 
 	// Member fields
 	private ConnectThread mConnectThread;
 	private MyBluetoothGattCallback mGattCallback;
 	private BluetoothManager mBluetoothManager;
-	
+    private BluetoothGatt mBluetoothGatt;
 
 	public BluetoothDevice getCurDevice() {
 		return mDevice;
@@ -68,8 +74,6 @@ public class ConnectService_bluetooth_4 extends BaseService {
 	 * 
 	 * @param device
 	 *            The BluetoothDevice to connect
-	 * @param secure
-	 *            Socket Security type - Secure (true) , Insecure (false)
 	 */
 	@Override
 	public synchronized boolean connect(BluetoothDevice device,
@@ -131,9 +135,11 @@ public class ConnectService_bluetooth_4 extends BaseService {
 //		startActivity(intent);
 //	}
 //	
-	class MyBluetoothGattCallback extends BluetoothGattCallback{
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    class MyBluetoothGattCallback extends BluetoothGattCallback{
 
-		@Override
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+        @Override
 		public void onConnectionStateChange(
 				BluetoothGatt gatt, int status, int newState) {
 			super.onConnectionStateChange(gatt, status,
@@ -156,7 +162,7 @@ public class ConnectService_bluetooth_4 extends BaseService {
 							saveSuccessedInfo();
 						};
 					}.start();
-					gatt.discoverServices();
+                    gatt.discoverServices();
 					setState(STATE_CONNECTED);
 				}else{
 					gatt.close();
@@ -182,6 +188,20 @@ public class ConnectService_bluetooth_4 extends BaseService {
 			Log.d(TAG, "onServicesDiscovered : "
 					+ "gatt -- " + gatt + "||||status -- "
 					+ status);
+            for(BluetoothGattService service : gatt.getServices()){
+                Log.d(TAG, "uuid : " + service.getUuid());
+                if(service.getUuid().toString().equals(PARENT_UUID)){
+                    for(BluetoothGattCharacteristic characteristic : service.getCharacteristics()){
+                        Log.d(TAG, "characterisic : " + characteristic.getUuid());
+                        if(characteristic.getUuid().toString().equals(CHILD_UUID)){
+                            gatt.readCharacteristic(characteristic);
+                            setCharacteristicNotification(characteristic, true);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
 		}
 
 		@Override
@@ -192,8 +212,8 @@ public class ConnectService_bluetooth_4 extends BaseService {
 			super.onCharacteristicRead(gatt,
 					characteristic, status);
 			Log.d(TAG, "onCharacteristicRead : "
-					+ "gatt -- " + gatt + "||||status -- "
-					+ status);
+                    + "gatt -- " + gatt + "||||status -- "
+                    + status);
 		}
 
 		@Override
@@ -214,9 +234,13 @@ public class ConnectService_bluetooth_4 extends BaseService {
 				BluetoothGattCharacteristic characteristic) {
 			super.onCharacteristicChanged(gatt,
 					characteristic);
+            byte data[] = characteristic.getValue();
+            final StringBuilder stringBuilder = new StringBuilder(data.length);
+            for(byte byteChar : data)
+                stringBuilder.append(String.format("%02X ", byteChar));
 			Log.d(TAG, "onCharacteristicChanged : "
-					+ "gatt -- " + gatt + "||||characteristic -- "
-					+ characteristic);
+                    + "gatt -- " + gatt + "||||characteristic -- "
+                    + stringBuilder);
 		}
 
 		@Override
@@ -236,8 +260,8 @@ public class ConnectService_bluetooth_4 extends BaseService {
 			super.onDescriptorWrite(gatt, descriptor,
 					status);
 			Log.d(TAG, "onDescriptorWrite : "
-					+ "descriptor -- " + descriptor + "||||status -- "
-					+ status);
+                    + "descriptor -- " + descriptor + "||||status -- "
+                    + status);
 		}
 
 		@Override
@@ -245,8 +269,8 @@ public class ConnectService_bluetooth_4 extends BaseService {
 				BluetoothGatt gatt, int status) {
 			super.onReliableWriteCompleted(gatt, status);
 			Log.d(TAG, "onReliableWriteCompleted : "
-					+ "gatt -- " + gatt + "||||status -- "
-					+ status);
+                    + "gatt -- " + gatt + "||||status -- "
+                    + status);
 		}
 
 		@Override
@@ -272,13 +296,14 @@ public class ConnectService_bluetooth_4 extends BaseService {
 			mmDevice = device;
 		}
 
-		public void run() {
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+        public void run() {
 			try {
 				Log.i(TAG, "BEGIN mConnectThread");
 				setName("ConnectThread");
 				if(null == mGattCallback)
 					mGattCallback = new MyBluetoothGattCallback();
-				mmDevice.connectGatt(ConnectService_bluetooth_4.this, false, mGattCallback);
+                mBluetoothGatt = mmDevice.connectGatt(ConnectService_bluetooth_4.this, false, mGattCallback);
 			} catch (Exception e) {
 				Log.e(TAG, "连接～～～", e);
 			}
@@ -293,13 +318,40 @@ public class ConnectService_bluetooth_4 extends BaseService {
 		System.out.println("保存!!~~~~");
 	}
 
+    /**
+     * Enables or disables notification on a give characteristic.
+     *
+     * @param characteristic Characteristic to act on.
+     * @param enabled If true, enable notification.  False otherwise.
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public void setCharacteristicNotification(BluetoothGattCharacteristic characteristic,
+                                              boolean enabled) {
+        if (mBluetoothManager == null || mBluetoothManager.getAdapter() == null || mBluetoothGatt == null) {
+            Log.w(TAG, "BluetoothAdapter not initialized");
+            return;
+        }
 
-	@Override
+        mBluetoothGatt.setCharacteristicNotification(characteristic, enabled);
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    @Override
+    public void sendMsg(byte[] b) {
+        BluetoothGattCharacteristic characteristic1 = mBluetoothGatt
+                .getService(UUID.fromString(PARENT_UUID))
+                .getCharacteristic(UUID.fromString(WRITE_UUID));
+        characteristic1.setValue(b);
+        mBluetoothGatt.writeCharacteristic(characteristic1);
+    }
+
+    @Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
 	
-	@Override
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    @Override
 	public void onDestroy() {
 		if(null != mDevice){
 			resetState();
